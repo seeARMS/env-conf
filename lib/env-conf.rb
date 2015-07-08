@@ -147,6 +147,17 @@ module Config
     self[name] && Integer(self[name])
   end
 
+  # An environment variable converted to a Fixnum.
+  #
+  # @param name [String] The name of the environment variable to fetch a
+  #   Fixnum for.
+  # @raise [RuntimeError] Raised if the environment variable is not defined
+  #   or not able to be coerced to a Fixnum.
+  # @return [Fixnum] The number stored in the environment variable.
+  def self.int!(name)
+    int(name) || raise("missing or invalid #{name}")
+  end
+
   # Comma-separated words converted to an array.
   #
   # @param name [String] The name of the environment variable to fetch an
@@ -181,6 +192,15 @@ module Config
   # @return [URI] URI if the value is parseable, otherwise false.
   def self.uri(name)
     self[name] && URI.parse(self[name])
+  end
+
+  # An environment variable converted to a URI.
+  #
+  # @param name [String|Symbol] The name of the environment variable.
+  # @raise [RuntimeError] Raised if the environment variable is not defined.
+  # @return [URI] A URI representation of the environment variable.
+  def self.uri!(name)
+    uri(name) || raise("missing #{name}")
   end
 
   # Loads a ".env" file, using Dotenv to parse but not fuck up the ENV

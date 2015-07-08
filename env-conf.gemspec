@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Chris Continanza"]
   spec.email         = ["christopher.continanza@gmail.com"]
   spec.summary       = %q{Use ENV vars for Configuration}
-  spec.description   = %q{Follwing 12-factor principles, we use the ENV vars for configuration.}
+  spec.description   = %q{Following 12-factor principles, we use the ENV vars for configuration.}
   spec.homepage      = ""
   spec.license       = "MIT"
 

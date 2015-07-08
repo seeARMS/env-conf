@@ -1,6 +1,6 @@
 require 'helper'
 
-class ConfigTest < Test 
+class ConfigTest < Test
   # Config.env returns the value matching the specified environment
   # variable name.
   def test_env
@@ -127,6 +127,22 @@ class ConfigTest < Test
     assert_raises(ArgumentError){ Config.time(:foo) }
   end
 
+  # Config.int!(VAR) returns VAR as integer
+  # or raises exception
+  def test_int!
+    assert_raises(RuntimeError){ Config.int!('MISSING') }
+    set_env 'FOO', "3000"
+    assert_equal(3000, Config.int!('FOO'))
+    assert_equal(3000, Config.int!(:foo))
+    set_env 'FOO', "1.0"
+    assert_raises(ArgumentError){ Config.int!('FOO') }
+    set_env 'FOO', nil
+    assert_raises(RuntimeError){ Config.int!(:foo) }
+    set_env 'FOO', "a"
+    assert_raises(ArgumentError){ Config.int!(:foo) }
+  end
+
+
   # Config.time returns nil or VAR as time
   def test_time
     assert_equal(nil, Config.time('T'))
@@ -149,9 +165,24 @@ class ConfigTest < Test
     assert_raises(ArgumentError){ Config.time(:t) }
   end
 
-  # Config.time returns nil or VAR as URI
+  # Config.uri returns nil or VAR as URI
   def test_uri
     assert_equal(nil, Config.uri('URL'))
+    set_env 'URL', 'http://user:password@the-web.com/path/to/greatness?foo=bar'
+    uri = Config.uri('URL')
+    assert_equal('http', uri.scheme)
+    assert_equal('the-web.com', uri.host)
+    assert_equal('/path/to/greatness', uri.path)
+    assert_equal('foo=bar', uri.query)
+    assert_equal(80, uri.port)
+    assert_equal('user', uri.user)
+    assert_equal('password', uri.password)
+  end
+
+  # Config.uri! returns the VAR as URI or raises
+  # exception
+  def test_uri!
+    assert_raises(RuntimeError){ Config.uri!('MISSING') }
     set_env 'URL', 'http://user:password@the-web.com/path/to/greatness?foo=bar'
     uri = Config.uri('URL')
     assert_equal('http', uri.scheme)
@@ -198,7 +229,7 @@ class ConfigTest < Test
     Config.default(:foo, false)
     assert_equal(false, Config.bool?(:foo))
   end
-  
+
   def test_app_env
     set_env 'RACK_ENV', nil
     assert_raises RuntimeError do
